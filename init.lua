@@ -166,53 +166,94 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  -- {
+  --   'zbirenbaum/copilot.lua',
+  --   cmd = 'Copilot',
+  --   lazy = true,
+  --   config = function()
+  --     require('copilot').setup {
+  --       panel = {
+  --         enabled = true,
+  --         auto_refresh = false,
+  --         keymap = {
+  --           jump_prev = '[[',
+  --           jump_next = ']]',
+  --           accept = '<CR>',
+  --           refresh = 'gr',
+  --           open = '<M-CR>',
+  --         },
+  --         layout = {
+  --           position = 'bottom', -- | top | left | right
+  --           ratio = 0.4,
+  --         },
+  --       },
+  --       suggestion = {
+  --         enabled = true,
+  --         auto_trigger = false,
+  --         debounce = 75,
+  --         keymap = {
+  --           accept = '<M-l>',
+  --           accept_word = false,
+  --           accept_line = false,
+  --           next = '<M-j>',
+  --           prev = '<M-k>',
+  --           dismiss = '<C-]>',
+  --         },
+  --       },
+  --       filetypes = {
+  --         yaml = false,
+  --         markdown = false,
+  --         help = false,
+  --         gitcommit = false,
+  --         gitrebase = false,
+  --         hgcommit = false,
+  --         svn = false,
+  --         cvs = false,
+  --         ['.'] = false,
+  --       },
+  --       copilot_node_command = 'node', -- Node.js version must be > 18.x
+  --       server_opts_overrides = {},
+  --     }
+  --   end,
+  -- },
   {
-    'zbirenbaum/copilot.lua',
-    cmd = 'Copilot',
-    lazy = true,
+    'olimorris/codecompanion.nvim',
+    opts = {},
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
     config = function()
-      require('copilot').setup {
-        panel = {
-          enabled = true,
-          auto_refresh = false,
-          keymap = {
-            jump_prev = '[[',
-            jump_next = ']]',
-            accept = '<CR>',
-            refresh = 'gr',
-            open = '<M-CR>',
+      require('codecompanion').setup {
+        strategies = {
+          chat = {
+            adapter = 'ollama',
+            model = 'gemma3:12b',
           },
-          layout = {
-            position = 'bottom', -- | top | left | right
-            ratio = 0.4,
+          inline = {
+            adapter = 'ollama',
+            model = 'codegemma:7b',
           },
-        },
-        suggestion = {
-          enabled = true,
-          auto_trigger = false,
-          debounce = 75,
-          keymap = {
-            accept = '<M-l>',
-            accept_word = false,
-            accept_line = false,
-            next = '<M-j>',
-            prev = '<M-k>',
-            dismiss = '<C-]>',
+          cmd = {
+            adapter = 'ollama',
+            model = 'gemma3:12b',
           },
         },
-        filetypes = {
-          yaml = false,
-          markdown = false,
-          help = false,
-          gitcommit = false,
-          gitrebase = false,
-          hgcommit = false,
-          svn = false,
-          cvs = false,
-          ['.'] = false,
+        adapters = {
+          ollama = function()
+            return require('codecompanion.adapters').extend('ollama', {
+              env = {
+                url = 'https://ai.viminaria.com',
+              },
+              headers = {
+                ['Content-Type'] = 'application/json',
+              },
+              parameters = {
+                sync = true,
+              },
+            })
+          end,
         },
-        copilot_node_command = 'node', -- Node.js version must be > 18.x
-        server_opts_overrides = {},
       }
     end,
   },
